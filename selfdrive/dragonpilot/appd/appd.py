@@ -40,15 +40,15 @@ offroad_main = ".MainActivity"
 
 def main(gctx=None):
 
-  dragon_enable_tomtom = True if params.get('DragonEnableTomTom', encoding='utf8') == "1" else False
-  dragon_enable_autonavi = True if params.get('DragonEnableAutonavi', encoding='utf8') == "1" else False
-  dragon_enable_aegis = True if params.get('DragonEnableAegis', encoding='utf8') == "1" else False
-  dragon_enable_mixplorer = True if params.get('DragonEnableMixplorer', encoding='utf8') == "1" else False
-  dragon_boot_tomtom = True if params.get("DragonBootTomTom", encoding='utf8') == "1" else False
-  dragon_boot_autonavi = True if params.get("DragonBootAutonavi", encoding='utf8') == "1" else False
-  dragon_boot_aegis = True if params.get("DragonBootAegis", encoding='utf8') == "1" else False
-  dragon_greypanda_mode = True if params.get("DragonGreyPandaMode", encoding='utf8') == "1" else False
-  dragon_waze_mode = True if params.get("DragonWazeMode", encoding='utf8') == "1" else False
+  dragon_enable_tomtom = False
+  dragon_enable_autonavi = False
+  dragon_enable_aegis = False
+  dragon_enable_mixplorer = False
+  dragon_boot_tomtom = False
+  dragon_boot_autonavi = False
+  dragon_boot_aegis = False
+  dragon_greypanda_mode = False
+  dragon_waze_mode = False
   if dragon_waze_mode:
     dragon_enable_tomtom = False
     dragon_enable_autonavi = False
