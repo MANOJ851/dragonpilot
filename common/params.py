@@ -150,13 +150,17 @@ keys = {
   "DragonEnableSlowOnCurve": [TxType.PERSISTENT],
   "DragonEnableLeadCarMovingAlert": [TxType.PERSISTENT],
   "DragonToyotaSnGMod": [TxType.PERSISTENT],
-  "DragonIsEON": [TxType.PERSISTENT],
-  "DragonHWChecked": [TxType.PERSISTENT],
+  "DragonIsEON": [TxType.PERSISTENT], # deprecated
+  "DragonHWChecked": [TxType.PERSISTENT], # deprecated
   "DragonEnableSRLearner": [TxType.PERSISTENT],
   "DragonWazeMode": [TxType.PERSISTENT],
   "DragonRunWaze": [TxType.PERSISTENT],
   "DragonEnableAssistedLC": [TxType.PERSISTENT],
   "DragonEnableAutoLC": [TxType.PERSISTENT],
+  "DragonAssistedLCMinMPH": [TxType.PERSISTENT],
+  "DragonAutoLCMinMPH": [TxType.PERSISTENT],
+  "DragonAutoLCDelay": [TxType.PERSISTENT],
+  "DragonBTG": [TxType.PERSISTENT],
 }
 
 
