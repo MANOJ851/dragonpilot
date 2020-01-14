@@ -263,7 +263,7 @@ def main():
     system(f"settings put system accelerometer_rotation 0")
     system(f"settings put system user_rotation 1")
 
-  init_apps(apps)
+  # init_apps(apps)
 
   last_started = False
   thermal_sock = messaging.sub_sock('thermal')
