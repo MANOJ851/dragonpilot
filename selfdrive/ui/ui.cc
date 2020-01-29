@@ -237,20 +237,7 @@ static void ui_init_vision(UIState *s, const VisionStreamBufs back_bufs,
   s->limit_set_speed_timeout = UI_FREQ;
 
   // dragonpilot, 1hz
-  s->dragon_ui_speed_timeout = 100;
-  s->dragon_ui_event_timeout = 100;
-  s->dragon_ui_maxspeed_timeout = 100;
-  s->dragon_ui_face_timeout = 100;
-  s->dragon_ui_dev_timeout = 100;
-  s->dragon_ui_dev_mini_timeout = 100;
-  s->dragon_enable_dashcam_timeout = 100;
-  s->dragon_ui_volume_boost_timeout = 100;
-  s->dragon_driving_ui_timeout = 100;
-  s->dragon_ui_lane_timeout = 100;
-  s->dragon_ui_lead_timeout = 100;
-  s->dragon_ui_path_timeout = 100;
-  s->dragon_ui_blinker_timeout = 100;
-  s->dragon_waze_mode_timeout = 100;
+  s->dragon_ui_timeout = 100;
 }
 
 static PathData read_path(cereal_ModelData_PathData_ptr pathp) {
@@ -889,6 +876,7 @@ int main(int argc, char* argv[]) {
 
   set_volume(MIN_VOLUME);
   s->volume_timeout = 5 * UI_FREQ;
+  s->dragon_ui_info_timeout = 5 * UI_FREQ;
   int draws = 0;
   while (!do_exit) {
     bool should_swap = false;
@@ -997,13 +985,36 @@ int main(int argc, char* argv[]) {
       s->controls_seen = false;
     }
 
+    // update ui temp/battery values only when vision is up.
+    if (s->awake && s->vision_connected) {
+      if (s->dragon_ui_info_timeout > 0) {
+        s->dragon_ui_info_timeout--;
+      } else {
+        // update temp
+        int temp = open("/sys/devices/virtual/thermal/thermal_zone25/temp", O_RDONLY);
+        if (temp >= 0) {
+          char temp_buf[3];
+          read(temp, temp_buf, 3);
+          s->scene.pa0 = atoi(temp_buf);
+        }
+        // update battery level
+        int battery = open("/sys/class/power_supply/battery/capacity", O_RDONLY);
+        if (battery >= 0) {
+          char battery_buf[3];
+          read(battery, battery_buf, 3);
+          s->scene.batteryPercent = atoi(battery_buf);
+        }
+        s->dragon_ui_info_timeout = 5 * UI_FREQ;
+      }
+    }
+
     read_param_bool_timeout(&s->is_metric, "IsMetric", &s->is_metric_timeout);
     read_param_bool_timeout(&s->longitudinal_control, "LongitudinalControl", &s->longitudinal_control_timeout);
     read_param_bool_timeout(&s->limit_set_speed, "LimitSetSpeed", &s->limit_set_speed_timeout);
     read_param_float_timeout(&s->speed_lim_off, "SpeedLimitOffset", &s->limit_set_speed_timeout);
     // dragonpilot
-    read_param_float_timeout(&s->dragon_ui_volume_boost, "DragonUIVolumeBoost", &s->dragon_ui_volume_boost_timeout);
-    read_param_bool_timeout(&s->dragon_waze_mode, "DragonWazeMode", &s->dragon_waze_mode_timeout);
+    read_param_float_timeout(&s->dragon_ui_volume_boost, "DragonUIVolumeBoost", &s->dragon_ui_timeout);
+    read_param_bool_timeout(&s->dragon_waze_mode, "DragonWazeMode", &s->dragon_ui_timeout);
 
     if (s->dragon_waze_mode) {
       s->dragon_ui_speed = false;
@@ -1019,18 +1030,18 @@ int main(int argc, char* argv[]) {
       s->dragon_ui_path = false;
       s->dragon_ui_blinker = false;
     } else {
-      read_param_bool_timeout(&s->dragon_ui_speed, "DragonUISpeed", &s->dragon_ui_speed_timeout);
-      read_param_bool_timeout(&s->dragon_ui_event, "DragonUIEvent", &s->dragon_ui_event_timeout);
-      read_param_bool_timeout(&s->dragon_ui_maxspeed, "DragonUIMaxSpeed", &s->dragon_ui_maxspeed_timeout);
-      read_param_bool_timeout(&s->dragon_ui_face, "DragonUIFace", &s->dragon_ui_face_timeout);
-      read_param_bool_timeout(&s->dragon_ui_dev, "DragonUIDev", &s->dragon_ui_dev_timeout);
-      read_param_bool_timeout(&s->dragon_ui_dev_mini, "DragonUIDevMini", &s->dragon_ui_dev_mini_timeout);
-      read_param_bool_timeout(&s->dragon_enable_dashcam, "DragonEnableDashcam", &s->dragon_enable_dashcam_timeout);
-      read_param_bool_timeout(&s->dragon_driving_ui, "DragonDrivingUI", &s->dragon_driving_ui_timeout);
-      read_param_bool_timeout(&s->dragon_ui_lane, "DragonUILane", &s->dragon_ui_lane_timeout);
-      read_param_bool_timeout(&s->dragon_ui_lead, "DragonUILead", &s->dragon_ui_lead_timeout);
-      read_param_bool_timeout(&s->dragon_ui_path, "DragonUIPath", &s->dragon_ui_path_timeout);
-      read_param_bool_timeout(&s->dragon_ui_blinker, "DragonUIBlinker", &s->dragon_ui_blinker_timeout);
+      read_param_bool_timeout(&s->dragon_ui_speed, "DragonUISpeed", &s->dragon_ui_timeout);
+      read_param_bool_timeout(&s->dragon_ui_event, "DragonUIEvent", &s->dragon_ui_timeout);
+      read_param_bool_timeout(&s->dragon_ui_maxspeed, "DragonUIMaxSpeed", &s->dragon_ui_timeout);
+      read_param_bool_timeout(&s->dragon_ui_face, "DragonUIFace", &s->dragon_ui_timeout);
+      read_param_bool_timeout(&s->dragon_ui_dev, "DragonUIDev", &s->dragon_ui_timeout);
+      read_param_bool_timeout(&s->dragon_ui_dev_mini, "DragonUIDevMini", &s->dragon_ui_timeout);
+      read_param_bool_timeout(&s->dragon_enable_dashcam, "DragonEnableDashcam", &s->dragon_ui_timeout);
+      read_param_bool_timeout(&s->dragon_driving_ui, "DragonDrivingUI", &s->dragon_ui_timeout);
+      read_param_bool_timeout(&s->dragon_ui_lane, "DragonUILane", &s->dragon_ui_timeout);
+      read_param_bool_timeout(&s->dragon_ui_lead, "DragonUILead", &s->dragon_ui_timeout);
+      read_param_bool_timeout(&s->dragon_ui_path, "DragonUIPath", &s->dragon_ui_timeout);
+      read_param_bool_timeout(&s->dragon_ui_blinker, "DragonUIBlinker", &s->dragon_ui_timeout);
     }
 
     pthread_mutex_unlock(&s->lock);
