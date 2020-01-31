@@ -813,28 +813,20 @@ static void ui_draw_infobar(UIState *s) {
   localtime_r(&rawtime, &timeinfo);
   strftime(date_time, sizeof(date_time),"%D %T", &timeinfo);
 
-  // Create temp string
-  char temp[6];
-  snprintf(temp, sizeof(temp), "%02.0f°C", s->scene.pa0);
-
-  // create battery percentage string
-  char battery[4];
-  snprintf(battery, sizeof(battery), "%02d%%", s->scene.batteryPercent);
-
   if (s->dragon_ui_dev_mini) {
     char rel_steer[9];
-    snprintf(rel_steer, sizeof(rel_steer), "%s%05.1f°", s->scene.angleSteers < 0? "-" : "+", fabs(s->scene.angleSteers));
+    snprintf(rel_steer, sizeof(rel_steer), "%s% 5.1f°", s->scene.angleSteers < 0? "-" : "+", fabs(s->scene.angleSteers));
 
     char des_steer[9];
     if (s->scene.engaged) {
-      snprintf(des_steer, sizeof(des_steer), "%s%05.1f°", s->scene.angleSteersDes < 0? "-" : "+", fabs(s->scene.angleSteersDes));
+      snprintf(des_steer, sizeof(des_steer), "%s% 5.1f°", s->scene.angleSteersDes < 0? "-" : "+", fabs(s->scene.angleSteersDes));
     } else {
       snprintf(des_steer, sizeof(des_steer), "%7s", "-");
     }
 
     char lead_dist[8];
     if (s->scene.lead_status) {
-      snprintf(lead_dist, sizeof(lead_dist), "%06.2fm", s->scene.lead_d_rel);
+      snprintf(lead_dist, sizeof(lead_dist), "% 6.2fm", s->scene.lead_d_rel);
     } else {
       snprintf(lead_dist, sizeof(lead_dist), "%7s", "-");
     }
@@ -842,10 +834,8 @@ static void ui_draw_infobar(UIState *s) {
     snprintf(
       infobar,
       sizeof(infobar),
-      "%s /TMP: %s /BAT: %s /REL: %s /DES: %s /DIS: %s",
+      "%s /REL: %s /DES: %s /DIS: %s",
       date_time,
-      temp,
-      battery,
       rel_steer,
       des_steer,
       lead_dist
@@ -854,10 +844,8 @@ static void ui_draw_infobar(UIState *s) {
     snprintf(
       infobar,
       sizeof(infobar),
-      "%s /TMP: %s /BAT: %s",
-      date_time,
-      temp,
-      battery
+      "%s",
+      date_time
     );
   }
 
